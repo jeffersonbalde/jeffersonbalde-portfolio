@@ -5,64 +5,49 @@ const Experience = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showRightFade, setShowRightFade] = useState(true);
   const [showLeftFade, setShowLeftFade] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [scrollDirection, setScrollDirection] = useState("down");
+  const lastScrollY = useRef(0);
+  const sectionRef = useRef(null);
   const listRef = useRef(null);
 
   const experiences = [
     {
-      company: "Ibn Khuldoon National School",
-      title: "Full Stack Web and Mobile Developer",
-      location: "Educational Area Isa Town, Bahrain",
-      period: "May 2019 - Present",
+      company: "Self-Employed",
+      title: "Freelance Software Developer",
+      location: "Pagadian City, Philippines",
+      period: "2022 - Present",
       responsibilities: [
-        "Developed a CI/CD pipeline using GitHub Actions for automated deployment of a full-stack application (ReactJS, NodeJS, GraphQL) on AWS EC2, improving deployment efficiency and reliability for an internal school project.",
-        "Integrated Payment APIs, including Benefitpay and Creditmax, to streamline transaction processing and enhance payment functionality within the application.",
-        "Developed a full-stack Employee Appraisal System using React(NextJS) and Apollo GraphQL Server, implementing a responsive frontend for employee management and appraisal processes, enabling efficient data handling and user interactions.",
-        "Configured and deployed a Dell R450 server with Windows Server to support an in-house PowerSchool Student Information System (SIS), optimizing performance and reliability for school data management.",
-        "Customized the PowerSchool Student Information System (SIS) to enhance functionality and user experience, tailoring features to meet specific educational institution needs.",
+        "Developed custom POS systems, management tools, and desktop applications tailored to client business needs, improving operational efficiency and workflow automation.",
+        "Built responsive landing pages and online profiles for small businesses, enhancing their digital presence and customer engagement.",
+        "Created functional systems for students' capstone and thesis projects, delivering scalable solutions that meet academic requirements and real-world applications.",
+        "Designed user-friendly, responsive interfaces to enhance business visibility and improve user experience across multiple platforms.",
+        "Provided ongoing support, updates, and system optimization to ensure long-term reliability and performance for client projects.",
       ],
     },
     {
-      company: "Sendhive.io",
-      title: "Position Title",
-      location: "Location",
-      period: "Date Range",
+      company: "CPC Marketing Consultancy & Services",
+      title: "Computer Graphics Artist",
+      location: "Pagadian City, Philippines",
+      period: "2024 - Present",
       responsibilities: [
-        "Responsibility 1",
-        "Responsibility 2",
-        "Responsibility 3",
+        "Created banners, posters, and digital visuals using Figma and Canva, delivering high-quality marketing materials that aligned with brand guidelines.",
+        "Edited promotional videos using CapCut, producing engaging content for social media campaigns and brand promotion.",
+        "Produced and posted social media content for brand promotion, increasing online engagement and brand awareness.",
+        "Ensured consistent branding across all marketing materials, maintaining visual identity and brand standards.",
       ],
     },
     {
-      company: "Platinum Group Media Inc.",
-      title: "Position Title",
-      location: "Location",
-      period: "Date Range",
+      company: "Brown Butter Café",
+      title: "Kitchen Staff",
+      location: "Pagadian City, Philippines",
+      period: "2023-2024",
       responsibilities: [
-        "Responsibility 1",
-        "Responsibility 2",
-        "Responsibility 3",
-      ],
-    },
-    {
-      company: "Audiocheck.ca",
-      title: "Position Title",
-      location: "Location",
-      period: "Date Range",
-      responsibilities: [
-        "Responsibility 1",
-        "Responsibility 2",
-        "Responsibility 3",
-      ],
-    },
-    {
-      company: "ABS-CBN Broadcasting Corporation",
-      title: "Position Title",
-      location: "Location",
-      period: "Date Range",
-      responsibilities: [
-        "Responsibility 1",
-        "Responsibility 2",
-        "Responsibility 3",
+        "Assisted in food preparation, cooking, and plating, ensuring high-quality presentation and timely service.",
+        "Maintained cleanliness of kitchen areas, utensils, and equipment, adhering to health and safety regulations.",
+        "Organized ingredients, storage areas, and inventory supplies, optimizing kitchen workflow and efficiency.",
+        "Provided basic dine-in assistance and supported customer service needs, contributing to positive customer experiences.",
+        "Ensured compliance with safety and sanitation standards, maintaining a safe working environment for staff and customers.",
       ],
     },
   ];
@@ -142,12 +127,44 @@ const Experience = () => {
   };
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const currentScrollY = window.scrollY;
+          const direction =
+            currentScrollY > lastScrollY.current ? "down" : "up";
+
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            setScrollDirection(direction);
+          } else {
+            setIsVisible(false);
+          }
+        });
+      },
+      {
+        threshold: [0, 0.1, 0.2, 0.3],
+        rootMargin: "-100px 0px -100px 0px",
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const direction = currentScrollY > lastScrollY.current ? "down" : "up";
+      setScrollDirection(direction);
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     const checkScroll = () => {
       if (listRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = listRef.current;
-        // Show right fade if not scrolled to the end
         setShowRightFade(scrollLeft < scrollWidth - clientWidth - 10);
-        // Show left fade if scrolled away from start
         setShowLeftFade(scrollLeft > 10);
       }
     };
@@ -156,26 +173,43 @@ const Experience = () => {
     if (listElement) {
       checkScroll();
       listElement.addEventListener("scroll", checkScroll);
-      // Check on resize
       window.addEventListener("resize", checkScroll);
-      
+
       return () => {
-        listElement.removeEventListener("scroll", checkScroll);
+        if (sectionRef.current) {
+          observer.unobserve(sectionRef.current);
+        }
+        window.removeEventListener("scroll", handleScroll);
+        if (listElement) {
+          listElement.removeEventListener("scroll", checkScroll);
+        }
         window.removeEventListener("resize", checkScroll);
       };
     }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   return (
-    <section style={sectionStyle}>
-      <div className="container" style={{ maxWidth: "880px", margin: "0 auto" }}>
+    <section ref={sectionRef} style={sectionStyle} id="experience">
+      <div
+        className="container"
+        style={{ maxWidth: "980px", margin: "0 auto" }}
+      >
         <motion.h2
           className="experience-title"
           style={titleStyle}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ delay: 0.15, duration: 0.5, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{
+            opacity: isVisible ? 1 : 0,
+            y: isVisible ? 0 : scrollDirection === "down" ? -30 : 30,
+          }}
+          transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
         >
           Where I&apos;ve Worked
         </motion.h2>
@@ -188,19 +222,29 @@ const Experience = () => {
                 ref={listRef}
                 className="experience-company-list"
                 style={companyListStyle}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+                initial={{ opacity: 0, x: -30 }}
+                animate={{
+                  opacity: isVisible ? 1 : 0,
+                  x: isVisible ? 0 : scrollDirection === "down" ? 30 : -30,
+                }}
+                transition={{
+                  delay: 0.25,
+                  duration: 1.6,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
               >
                 {experiences.map((exp, index) => (
                   <li
                     key={index}
-                    className={index === selectedIndex ? "experience-company-selected" : ""}
+                    className={
+                      index === selectedIndex
+                        ? "experience-company-selected"
+                        : ""
+                    }
                     onClick={() => setSelectedIndex(index)}
                     style={companyItemStyle(index === selectedIndex)}
                   >
-                    {exp.company}
+                    {exp.title}
                   </li>
                 ))}
               </motion.ul>
@@ -222,7 +266,10 @@ const Experience = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <h3 className="experience-job-title" style={{ marginBottom: "0.5rem" }}>
+              <h3
+                className="experience-job-title"
+                style={{ marginBottom: "0.5rem" }}
+              >
                 <span style={jobTitleStyle}>
                   {experiences[selectedIndex].title}
                 </span>{" "}
@@ -234,7 +281,10 @@ const Experience = () => {
                 {experiences[selectedIndex].location} |{" "}
                 {experiences[selectedIndex].period}
               </p>
-              <ul className="experience-responsibilities" style={responsibilitiesListStyle}>
+              <ul
+                className="experience-responsibilities"
+                style={responsibilitiesListStyle}
+              >
                 {experiences[selectedIndex].responsibilities.map(
                   (responsibility, idx) => (
                     <li key={idx} style={responsibilityItemStyle}>
@@ -253,4 +303,3 @@ const Experience = () => {
 };
 
 export default Experience;
-

@@ -346,3 +346,39 @@ a:hover {
   background-color: #2a2b2e !important;
   color: #e5e7eb !important;
 }
+
+/* Works component - Mobile responsive images */
+@media (max-width: 991px) {
+  .works-project-image {
+    object-fit: contain !important;
+    height: auto !important;
+    max-height: 600px !important;
+    min-height: 300px !important;
+    width: 100% !important;
+  }
+}
+
+/* Other Noteworthy Projects - Responsive grid */
+@media (max-width: 768px) {
+  .other-projects-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .other-project-card {
+    min-height: auto !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+  .other-projects-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Certifications component - Mobile responsive */
+@media (max-width: 991px) {
+  .certification-image {
+    object-fit: cover !important;
+    height: 180px !important;
+  }
+}

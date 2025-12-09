@@ -2,9 +2,12 @@ import Navbar from "./Navbar";
 import Hero from "./Hero";
 import Technologies from "./Technologies";
 import Experience from "./Experience";
+import Works from "./Works";
+import Certifications from "./Certifications";
+import Contact from "./Contact";
 import Footer from "./Footer";
 
-const Homepage = () => {
+const Homepage = ({ onOpenGallery }) => {
   const pageStyle = {
     minHeight: "100vh",
     backgroundColor: "transparent",
@@ -20,6 +23,9 @@ const Homepage = () => {
       <Hero />
       <Technologies />
       <Experience />
+      <Works />
+      <Certifications onOpenGallery={onOpenGallery} />
+      <Contact />
       <Footer />
     </div>
   );

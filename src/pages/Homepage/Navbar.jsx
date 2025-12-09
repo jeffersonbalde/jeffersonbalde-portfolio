@@ -1,12 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import logoImg from "../../assets/logo.png";
+
+const NAV_ITEMS = [
+  { label: "About", href: "#about" },
+  { label: "Technologies", href: "#technologies" },
+  { label: "Experience", href: "#experience" },
+  { label: "Work", href: "#work" },
+  { label: "Certifications", href: "#certifications" },
+  { label: "Contact", href: "#contact" },
+];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("About");
+  const navRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +93,85 @@ const Navbar = () => {
     },
   };
 
+  // Smooth scroll with offset for fixed navbar
+  const handleNavClick = (href) => {
+    const targetId = href.replace("#", "");
+    const scrollToTarget = () => {
+      const element = document.getElementById(targetId);
+      if (element) {
+        const navHeight = navRef.current?.offsetHeight || 80;
+        const elementTop =
+          element.getBoundingClientRect().top +
+          window.scrollY -
+          navHeight +
+          4;
+        window.scrollTo({
+          top: elementTop,
+          behavior: "smooth",
+        });
+      }
+    };
+
+    // Close mobile menu first, then scroll after animation for reliability
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+      setTimeout(scrollToTarget, 260);
+    } else {
+      scrollToTarget();
+    }
+  };
+
+  // Track which section is in view to highlight nav item
+  useEffect(() => {
+    const updateActiveSection = () => {
+      const viewportCenter = window.scrollY + window.innerHeight / 2;
+      const nearPageBottom =
+        window.innerHeight + window.scrollY >=
+        document.body.scrollHeight - 20;
+      let closestLabel = NAV_ITEMS[0].label;
+      let smallestDistance = Infinity;
+
+      NAV_ITEMS.forEach(({ label, href }) => {
+        const id = href.replace("#", "");
+        const el = document.getElementById(id);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const top = rect.top + window.scrollY;
+          const height = rect.height;
+          const center = top + height / 2;
+          const distance = Math.abs(center - viewportCenter);
+
+          // Bias toward sections currently in view
+          const inView =
+            viewportCenter >= top - height * 0.25 &&
+            viewportCenter <= top + height * 1.25;
+          const effectiveDistance = inView ? distance * 0.5 : distance;
+
+          if (effectiveDistance < smallestDistance) {
+            smallestDistance = effectiveDistance;
+            closestLabel = label;
+          }
+        }
+      });
+
+      // If the user is at (or extremely near) the bottom, force the last item
+      if (nearPageBottom) {
+        closestLabel = NAV_ITEMS[NAV_ITEMS.length - 1].label;
+      }
+
+      setActiveSection(closestLabel);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, []);
+
   return (
     <motion.nav
       className="navbar navbar-expand-md navbar-dark navbar-blur"
@@ -89,6 +179,7 @@ const Navbar = () => {
       initial={{ y: 0 }}
       animate={{ y: isVisible ? 0 : -100 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
+      ref={navRef}
     >
       <div className="container-fluid px-0">
         <div style={logoBoxStyle}>
@@ -195,22 +286,27 @@ const Navbar = () => {
                 initial="closed"
                 animate="open"
               >
-                {["About", "Experience", "Work", "Contact"].map((item, index) => (
+                {NAV_ITEMS.map(({ label, href }, index) => (
                   <motion.li
                     className="nav-item"
-                    key={item}
+                    key={label}
                     variants={menuItemVariants}
                     style={{ width: "100%" }}
                   >
                     <a
                       className={`nav-link ${
-                        item === "About" ? "nav-link-active" : "nav-link-muted"
+                        label === activeSection
+                          ? "nav-link-active"
+                          : "nav-link-muted"
                       }`}
-                      href="#"
+                      href={href}
                       style={{ fontSize: "0.85rem", padding: "0.75rem 0" }}
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleNavClick(href);
+                      }}
                     >
-                      {item}
+                      {label}
                     </a>
                   </motion.li>
                 ))}
@@ -250,16 +346,22 @@ const Navbar = () => {
           id="navLinks"
         >
           <ul className="navbar-nav gap-3 align-items-center">
-            {["About", "Experience", "Work", "Contact"].map((item) => (
-              <li className="nav-item" key={item}>
+            {NAV_ITEMS.map(({ label, href }) => (
+              <li className="nav-item" key={label}>
                 <a
                   className={`nav-link ${
-                    item === "About" ? "nav-link-active" : "nav-link-muted"
+                    label === activeSection
+                      ? "nav-link-active"
+                      : "nav-link-muted"
                   }`}
-                  href="#"
+                  href={href}
                   style={{ fontSize: "0.85rem" }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(href);
+                  }}
                 >
-                  {item}
+                  {label}
                 </a>
               </li>
             ))}
