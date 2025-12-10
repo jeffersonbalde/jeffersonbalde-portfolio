@@ -7,7 +7,7 @@ import Certifications from "./Certifications";
 import Contact from "./Contact";
 import Footer from "./Footer";
 
-const Homepage = ({ onOpenGallery }) => {
+const Homepage = ({ onOpenGallery, onOpenManual }) => {
   const pageStyle = {
     minHeight: "100vh",
     backgroundColor: "transparent",
@@ -23,7 +23,7 @@ const Homepage = ({ onOpenGallery }) => {
       <Hero />
       <Technologies />
       <Experience />
-      <Works />
+      <Works onOpenManual={onOpenManual} />
       <Certifications onOpenGallery={onOpenGallery} />
       <Contact />
       <Footer />

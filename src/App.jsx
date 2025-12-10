@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import Homepage from "./pages/Homepage";
 import CertificateGallery from "./pages/Homepage/CertificateGallery";
+import SystemManualGallery from "./pages/Homepage/SystemManualGallery";
 
 const App = () => {
   const [activeGallery, setActiveGallery] = useState(null);
+  const [activeManual, setActiveManual] = useState(null);
 
   const handleOpenGallery = (galleryPayload) => {
     if (!galleryPayload) return;
@@ -15,9 +17,20 @@ const App = () => {
     });
   };
 
+  const handleOpenManual = (manualPayload) => {
+    if (!manualPayload) return;
+
+    setActiveManual({
+      title: manualPayload.title || "System Manual",
+      helperText: manualPayload.helperText,
+      images: manualPayload.images || [],
+      projectId: manualPayload.projectId,
+    });
+  };
+
   // Ensure we start at the top when entering the gallery view
   useEffect(() => {
-    if (activeGallery) {
+    if (activeGallery || activeManual) {
       const html = document.documentElement;
       const body = document.body;
       const originalHtmlScrollBehavior = html.style.scrollBehavior;
@@ -33,11 +46,13 @@ const App = () => {
         body.style.scrollBehavior = originalBodyScrollBehavior;
       });
     }
-  }, [activeGallery]);
+  }, [activeGallery, activeManual]);
 
   const handleBackToHomepage = () => {
     const certificateIndex = activeGallery?.certificateIndex;
+    const projectId = activeManual?.projectId;
     setActiveGallery(null);
+    setActiveManual(null);
 
     // Temporarily disable smooth scrolling on html and body
     const html = document.documentElement;
@@ -69,14 +84,42 @@ const App = () => {
               document.body.scrollTop = rect.top + scrollTop;
             }
           }
+        } else if (projectId !== undefined && projectId !== null) {
+          // Scroll back to the specific project card
+          const targetCard = document.getElementById(projectId);
+          if (targetCard) {
+            const rect = targetCard.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const targetY = rect.top + scrollTop - window.innerHeight / 2 + rect.height / 2;
+            // Direct assignment - most instant method
+            document.documentElement.scrollTop = targetY;
+            document.body.scrollTop = targetY;
+          } else {
+            // Fallback to Works section if card not found
+            const worksSection = document.getElementById("work");
+            if (worksSection) {
+              const rect = worksSection.getBoundingClientRect();
+              const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              document.documentElement.scrollTop = rect.top + scrollTop;
+              document.body.scrollTop = rect.top + scrollTop;
+            }
+          }
         } else {
-          // Fallback to certifications section if no index stored
-          const targetSection = document.getElementById("certifications-section");
-          if (targetSection) {
-            const rect = targetSection.getBoundingClientRect();
+          // Fallback to Works section if no project ID
+          const worksSection = document.getElementById("work");
+          if (worksSection) {
+            const rect = worksSection.getBoundingClientRect();
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             document.documentElement.scrollTop = rect.top + scrollTop;
             document.body.scrollTop = rect.top + scrollTop;
+          } else {
+            const targetSection = document.getElementById("certifications-section");
+            if (targetSection) {
+              const rect = targetSection.getBoundingClientRect();
+              const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+              document.documentElement.scrollTop = rect.top + scrollTop;
+              document.body.scrollTop = rect.top + scrollTop;
+            }
           }
         }
         
@@ -86,6 +129,17 @@ const App = () => {
       });
     });
   };
+
+  if (activeManual) {
+    return (
+      <SystemManualGallery
+        title={activeManual.title}
+        helperText={activeManual.helperText}
+        images={activeManual.images}
+        onBack={handleBackToHomepage}
+      />
+    );
+  }
 
   if (activeGallery) {
     return (
@@ -97,7 +151,12 @@ const App = () => {
     );
   }
 
-  return <Homepage onOpenGallery={handleOpenGallery} />;
+  return (
+    <Homepage
+      onOpenGallery={handleOpenGallery}
+      onOpenManual={handleOpenManual}
+    />
+  );
 };
 
 export default App;

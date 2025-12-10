@@ -26,7 +26,282 @@ import graphicDesign13 from "../../assets/Graphic Design Works I've Created/13.p
 import graphicDesign14 from "../../assets/Graphic Design Works I've Created/14.png";
 import graphicDesign15 from "../../assets/Graphic Design Works I've Created/15.png";
 
-const Works = () => {
+const brimsManualModules = import.meta.glob(
+  "../../assets/BRIMS/**/*.{png,jpg,jpeg}",
+  { eager: true }
+);
+
+const brimsSectionTitles = {
+  FEATURES: "Features",
+  ADMIN: "Admin",
+  BARANGAY: "Barangay",
+};
+
+// Override captions here if you want custom text for a specific image
+// Keyed by section then by screen number (string) or filename base.
+const brimsCaptionOverrides = {
+  FEATURES: {},
+  ADMIN: {},
+  BARANGAY: {},
+};
+
+const buildBrimsCaption = (sectionRaw, number, labelBase) => {
+  const sectionKey = sectionRaw.toUpperCase();
+  const sectionTitle = brimsSectionTitles[sectionKey] || "BRIMS";
+  const overrideKey = number || labelBase;
+  const override = brimsCaptionOverrides[sectionKey]?.[overrideKey];
+  if (override) return override;
+  const screenLabel = number ? `Screen ${Number(number)}` : labelBase || "View";
+  return `${sectionTitle} – ${screenLabel}`;
+};
+
+const brimsManualImages = Object.entries(brimsManualModules)
+  .map(([path, module]) => {
+    const normalizedPath = path.replace("../../assets/BRIMS/", "");
+    const [section = "BRIMS", filename = ""] = normalizedPath.split("/");
+    const numberMatch = filename.match(/(\d+)/);
+    const sortKey = `${section}-${numberMatch ? numberMatch[1].padStart(4, "0") : filename}`;
+    const labelBase = filename
+      .replace(/\.(png|jpg|jpeg)$/i, "")
+      .replace(/[-_]/g, " ")
+      .trim();
+    const label = buildBrimsCaption(section, numberMatch?.[1], labelBase);
+    return {
+      src: module.default,
+      label,
+      sortKey,
+    };
+  })
+  .sort((a, b) =>
+    a.sortKey.localeCompare(b.sortKey, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  )
+  .map(({ src, label }) => ({ src, label }));
+
+// Automated Civil Records manual images
+const civilRecordsManualModules = import.meta.glob(
+  "../../assets/AutomatedCivilRecords/*.{png,jpg,jpeg}",
+  { eager: true }
+);
+
+// Override captions here if you want custom text for a specific screen
+// Keyed by screen number (string)
+const civilRecordsCaptionOverrides = {};
+
+const buildCivilRecordsCaption = (number) => {
+  const override = civilRecordsCaptionOverrides[number];
+  if (override) return override;
+  return `Screen ${Number(number)}`;
+};
+
+const civilRecordsManualImages = Object.entries(civilRecordsManualModules)
+  .map(([path, module]) => {
+    const filename = path.split("/").pop() || "";
+    const numberMatch = filename.match(/(\d+)/);
+    const number = numberMatch ? numberMatch[1] : null;
+    const sortKey = number ? number.padStart(4, "0") : filename;
+    const label = buildCivilRecordsCaption(number || "0");
+    return {
+      src: module.default,
+      label,
+      sortKey,
+    };
+  })
+  .sort((a, b) =>
+    a.sortKey.localeCompare(b.sortKey, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  )
+  .map(({ src, label }) => ({ src, label }));
+
+// Inventory System manual images
+const inventorySystemManualModules = import.meta.glob(
+  "../../assets/InventorySystem/**/*.{png,jpg,jpeg}",
+  { eager: true }
+);
+
+const inventorySystemSectionTitles = {
+  ACCOUNTING: "Accounting",
+  "ICT ADMIN": "ICT Admin",
+  PERSONNEL: "Personnel",
+  "PROPERTY CUSTODIAN": "Property Custodian",
+};
+
+// Override captions here if you want custom text for a specific image
+// Keyed by section then by screen number (string) or filename base.
+const inventorySystemCaptionOverrides = {
+  ACCOUNTING: {},
+  "ICT ADMIN": {},
+  PERSONNEL: {},
+  "PROPERTY CUSTODIAN": {},
+};
+
+const buildInventorySystemCaption = (sectionRaw, number, labelBase) => {
+  const sectionKey = sectionRaw.toUpperCase();
+  const sectionTitle = inventorySystemSectionTitles[sectionKey] || "Inventory System";
+  const overrideKey = number || labelBase;
+  const override = inventorySystemCaptionOverrides[sectionKey]?.[overrideKey];
+  if (override) return override;
+  const screenLabel = number ? `Screen ${Number(number)}` : labelBase || "View";
+  return `${sectionTitle} – ${screenLabel}`;
+};
+
+const inventorySystemManualImages = Object.entries(inventorySystemManualModules)
+  .map(([path, module]) => {
+    const normalizedPath = path.replace("../../assets/InventorySystem/", "");
+    const [section = "InventorySystem", filename = ""] = normalizedPath.split("/");
+    const numberMatch = filename.match(/(\d+)/);
+    const sortKey = `${section}-${numberMatch ? numberMatch[1].padStart(4, "0") : filename}`;
+    const labelBase = filename
+      .replace(/\.(png|jpg|jpeg)$/i, "")
+      .replace(/[-_]/g, " ")
+      .trim();
+    const label = buildInventorySystemCaption(section, numberMatch?.[1], labelBase);
+    return {
+      src: module.default,
+      label,
+      sortKey,
+    };
+  })
+  .sort((a, b) =>
+    a.sortKey.localeCompare(b.sortKey, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  )
+  .map(({ src, label }) => ({ src, label }));
+
+// Aurora Waterworks Payflow manual images
+const auroraWaterworksManualModules = import.meta.glob(
+  "../../assets/AuroraWaterworksPayflow/**/*.{png,jpg,jpeg}",
+  { eager: true }
+);
+
+const auroraWaterworksSectionTitles = {
+  ADMIN: "Admin",
+  CUSTOMER: "Customer",
+};
+
+// Override captions here if you want custom text for a specific image
+// Keyed by section then by screen number (string) or filename base.
+const auroraWaterworksCaptionOverrides = {
+  ADMIN: {},
+  CUSTOMER: {},
+};
+
+const buildAuroraWaterworksCaption = (sectionRaw, number, labelBase) => {
+  const sectionKey = sectionRaw.toUpperCase();
+  const sectionTitle = auroraWaterworksSectionTitles[sectionKey] || "Aurora Waterworks";
+  const overrideKey = number || labelBase;
+  const override = auroraWaterworksCaptionOverrides[sectionKey]?.[overrideKey];
+  if (override) return override;
+  const screenLabel = number ? `Screen ${Number(number)}` : labelBase || "View";
+  return `${sectionTitle} – ${screenLabel}`;
+};
+
+const auroraWaterworksManualImages = Object.entries(auroraWaterworksManualModules)
+  .map(([path, module]) => {
+    const normalizedPath = path.replace("../../assets/AuroraWaterworksPayflow/", "");
+    const [section = "AuroraWaterworks", filename = ""] = normalizedPath.split("/");
+    const numberMatch = filename.match(/(\d+)/);
+    const sortKey = `${section}-${numberMatch ? numberMatch[1].padStart(4, "0") : filename}`;
+    const labelBase = filename
+      .replace(/\.(png|jpg|jpeg)$/i, "")
+      .replace(/[-_]/g, " ")
+      .trim();
+    const label = buildAuroraWaterworksCaption(section, numberMatch?.[1], labelBase);
+    return {
+      src: module.default,
+      label,
+      sortKey,
+    };
+  })
+  .sort((a, b) =>
+    a.sortKey.localeCompare(b.sortKey, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  )
+  .map(({ src, label }) => ({ src, label }));
+
+// RG's Garage POS manual images
+const rgGaragePOSManualModules = import.meta.glob(
+  "../../assets/RGGaragePOS/*.{png,jpg,jpeg}",
+  { eager: true }
+);
+
+// Override captions here if you want custom text for a specific screen
+// Keyed by screen number (string)
+const rgGaragePOSCaptionOverrides = {};
+
+const buildRGGaragePOSCaption = (number) => {
+  const override = rgGaragePOSCaptionOverrides[number];
+  if (override) return override;
+  return `Screen ${Number(number)}`;
+};
+
+const rgGaragePOSManualImages = Object.entries(rgGaragePOSManualModules)
+  .map(([path, module]) => {
+    const filename = path.split("/").pop() || "";
+    const numberMatch = filename.match(/(\d+)/);
+    const number = numberMatch ? numberMatch[1] : null;
+    const sortKey = number ? number.padStart(4, "0") : filename;
+    const label = buildRGGaragePOSCaption(number || "0");
+    return {
+      src: module.default,
+      label,
+      sortKey,
+    };
+  })
+  .sort((a, b) =>
+    a.sortKey.localeCompare(b.sortKey, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  )
+  .map(({ src, label }) => ({ src, label }));
+
+// MJ Printing & Tailoring POS System manual images
+const mjPOSSystemManualModules = import.meta.glob(
+  "../../assets/MJPOSSystem/*.{png,jpg,jpeg}",
+  { eager: true }
+);
+
+// Override captions here if you want custom text for a specific screen
+// Keyed by screen number (string)
+const mjPOSSystemCaptionOverrides = {};
+
+const buildMJPOSSystemCaption = (number) => {
+  const override = mjPOSSystemCaptionOverrides[number];
+  if (override) return override;
+  return `Screen ${Number(number)}`;
+};
+
+const mjPOSSystemManualImages = Object.entries(mjPOSSystemManualModules)
+  .map(([path, module]) => {
+    const filename = path.split("/").pop() || "";
+    const numberMatch = filename.match(/(\d+)/);
+    const number = numberMatch ? numberMatch[1] : null;
+    const sortKey = number ? number.padStart(4, "0") : filename;
+    const label = buildMJPOSSystemCaption(number || "0");
+    return {
+      src: module.default,
+      label,
+      sortKey,
+    };
+  })
+  .sort((a, b) =>
+    a.sortKey.localeCompare(b.sortKey, undefined, {
+      numeric: true,
+      sensitivity: "base",
+    })
+  )
+  .map(({ src, label }) => ({ src, label }));
+
+const Works = ({ onOpenManual }) => {
   const [scrollDirection, setScrollDirection] = useState("down");
   const [visibleProjects, setVisibleProjects] = useState({});
   const [isPaused, setIsPaused] = useState(false);
@@ -156,12 +431,15 @@ const Works = () => {
   const featuredProjects = [
     {
       type: "Client Project - Heraldo Juan Cadampog",
-    title: "BRIMS - Barangay Real Time Incident Monitoring System",
-    description:
+      title: "BRIMS - Barangay Real Time Incident Monitoring System",
+      description:
         "Designed and developed a real-time incident reporting platform for municipal administrators and barangay personnel, developed for use by the Municipality of Kumalarang. The system replaces manual paper-based workflows by allowing barangays to submit detailed incident reports—including affected individuals, demographic data, and injury details—directly to the municipal dashboard. Admin users can review, validate, and investigate incidents, manage relief assistance, and quickly assess the total affected population. BRIMS also provides automated reports and analytics to help decision-makers respond faster and improve overall disaster and incident management.",
       technologies: ["React.js", "JavaScript", "PHP (Laravel)", "MySQL", "Bootstrap", "DigitalOcean"],
       manualUrl: "#",
-      demoUrl: "#",
+      manualImages: brimsManualImages,
+      manualHelperText:
+        "UI walkthrough covering BRIMS features for municipality admins and barangay personnel, including reporting, validation, assistance management, and analytics.",
+      demoUrl: "https://brimsclient-ihpwt.ondigitalocean.app/",
       image: projectImage,
     },
     {
@@ -171,7 +449,10 @@ const Works = () => {
         "Designed and developed an automated records management system for the City of Pagadian that replaces the manual, logbook-based process used for registering birth, marriage, and death records. The system enables staff to digitally encode and store records in a centralized database, making searches faster and more accurate. It also automates the generation of official certificates, reducing processing time and minimizing human errors. With built-in analytics and reporting tools, the platform provides a more organized, efficient, and reliable workflow for civil registry operations.",
       technologies: ["React.js", "JavaScript", "PHP (Laravel)", "MySQL", "Bootstrap", "DigitalOcean"],
       manualUrl: "#",
-      demoUrl: "#",
+      manualImages: civilRecordsManualImages,
+      manualHelperText:
+        "UI walkthrough covering the Automated Civil Records Management system for staff and administrators, including record registration, certificate generation, search functionality, and system administration features.",
+      demoUrl: "https://automatedcivilrecords-client-3s725.ondigitalocean.app/",
       image: civilImage,
     },
     {
@@ -181,7 +462,10 @@ const Works = () => {
         "Designed and developed an inventory management system to automate the tracking, assignment, and monitoring of DepEd resources across all schools. The system replaces manual record-keeping by allowing ICT Admins, Property Custodians, Teachers, and Accounting personnel to manage accounts, record inventory, assign equipment, and generate certificates automatically. With built-in analytics and reporting, the platform enables faster decision-making, improves accountability, and ensures efficient resource distribution throughout the division.",
       technologies: ["React.js", "JavaScript", "PHP (Laravel)", "MySQL", "Bootstrap", "DigitalOcean"],
       manualUrl: "#",
-      demoUrl: "#",
+      manualImages: inventorySystemManualImages,
+      manualHelperText:
+        "UI walkthrough covering the Inventory System features for ICT Admins, Property Custodians, Personnel, and Accounting staff, including inventory management, equipment assignment, certificate generation, and system administration.",
+      demoUrl: "https://dbest-client-cobe7.ondigitalocean.app/",
       image: dbestImage,
     },
     {
@@ -191,7 +475,10 @@ const Works = () => {
         "Designed and developed an online water billing and payment system for the Municipality of Aurora, enabling customers to securely view their profile, water usage, billing details, and payment history, and make payments online. The system replaces manual, in-office transactions, streamlining the payment process for both residents and municipal staff. Administrators can manage all customer accounts, generate bills, and access reports and analytics to monitor total billing, water usage trends, and operational performance, improving efficiency and decision-making across the municipality.",
       technologies: ["React.js", "JavaScript", "PHP (Laravel)", "MySQL", "Bootstrap", "DigitalOcean"],
       manualUrl: "#",
-      demoUrl: "#",
+      manualImages: auroraWaterworksManualImages,
+      manualHelperText:
+        "UI walkthrough covering Aurora Waterworks Payflow features for administrators and customers, including account management, billing, payment processing, water usage tracking, and analytics.",
+      demoUrl: "https://aurorawaterworkspayflow-client-suowc.ondigitalocean.app/",
       image: auroraImage,
     },
   ];
@@ -204,6 +491,9 @@ const Works = () => {
         "Custom Windows-based POS system for automotive services in Quezon. Replaced manual logbooks with digital transaction tracking, service history management, and automated sales/expense reporting to improve business performance.",
       technologies: ["C#", ".NET Windows Forms", "Microsoft SQL Server", "SSMS", "RDLC/Crystal Reports"],
       manualUrl: "#",
+      manualImages: rgGaragePOSManualImages,
+      manualHelperText:
+        "UI walkthrough covering RG's Garage POS system features, including transaction tracking, service history management, sales reporting, and expense monitoring.",
       demoUrl: "#",
       image: pos1Image,
     },
@@ -214,6 +504,9 @@ const Works = () => {
         "Offline Windows-based POS system for printing and tailoring services in Pagadian City. Streamlined order management, transaction tracking, expense monitoring, and automated financial reporting with built-in analytics.",
       technologies: ["C#", ".NET Windows Forms", "Microsoft SQL Server", "SSMS", "RDLC/Crystal Reports"],
       manualUrl: "#",
+      manualImages: mjPOSSystemManualImages,
+      manualHelperText:
+        "UI walkthrough covering MJ Printing & Tailoring POS system features, including order management, transaction tracking, expense monitoring, and automated financial reporting.",
       demoUrl: "#",
       image: pos2Image,
     },
@@ -223,8 +516,8 @@ const Works = () => {
       description:
         "Responsive landing page for C&S Cakes and Bakery Products in Pagadian City. Showcases cake creations, bakery menus, flavors, and gallery with essential contact information to enhance online presence and attract customers.",
       technologies: ["HTML", "CSS", "JavaScript"],
-      manualUrl: "#",
-      demoUrl: "#",
+      manualUrl: "https://github.com/jeffersonbalde/CSCakesAndBakeryProductsWebsite",
+      demoUrl: "https://cands.vercel.app/",
       image: cAndsImage,
     },
     {
@@ -233,8 +526,8 @@ const Works = () => {
       description:
         "Modern website for the Sangguniang Kabataan of Barangay Lumbia, Pagadian City. Features official profiles, committee roles, project showcases, and community events to improve civic engagement and information accessibility.",
       technologies: ["Next.js", "TypeScript", "Tailwind CSS"],
-      manualUrl: "#",
-      demoUrl: "#",
+      manualUrl: "https://github.com/jeffersonbalde/SKLumbiaWebsite",
+      demoUrl: "https://sk-lumbia.vercel.app/",
       image: lumbiaImage,
     },
     {
@@ -243,8 +536,8 @@ const Works = () => {
       description:
         "Professional portfolio website showcasing creative works, client collaborations, and expertise. Features skills, hobbies, featured projects, and contact section to enhance online branding and opportunities.",
       technologies: ["Next.js", "TypeScript", "Tailwind CSS"],
-    manualUrl: "#",
-    demoUrl: "#",
+    manualUrl: "https://github.com/jeffersonbalde/aisledesigns.com",
+    demoUrl: "https://ysl-portfolio.vercel.app/",
       image: yslImage,
     },
   ];
@@ -376,6 +669,7 @@ const Works = () => {
           return (
             <motion.div
               key={index}
+              id={`featured-project-${index}`}
               ref={(el) => {
                 if (el) {
                   el.dataset.projectId = projectId;
@@ -396,29 +690,62 @@ const Works = () => {
                 ease: [0.16, 1, 0.3, 1],
               }}
             >
-          <motion.div
-            style={imageWrapperStyle}
-            initial="rest"
-            animate="rest"
-            whileHover="hover"
-          >
+          {project.demoUrl && project.demoUrl !== "#" ? (
+            <motion.a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: "block", textDecoration: "none" }}
+            >
+              <motion.div
+                style={imageWrapperStyle}
+                initial="rest"
+                animate="rest"
+                whileHover="hover"
+              >
+                <img 
+                  src={project.image} 
+                  alt={project.title} 
+                  style={imageStyle}
+                  className="works-project-image"
+                />
+                <motion.div
+                  style={overlayStyle}
+                  variants={{
+                    rest: { opacity: 0.55 },
+                    hover: {
+                      opacity: 0,
+                      transition: { duration: 0.45, ease: "easeOut" },
+                    },
+                  }}
+                />
+              </motion.div>
+            </motion.a>
+          ) : (
+            <motion.div
+              style={imageWrapperStyle}
+              initial="rest"
+              animate="rest"
+              whileHover="hover"
+            >
               <img 
                 src={project.image} 
                 alt={project.title} 
                 style={imageStyle}
                 className="works-project-image"
               />
-            <motion.div
-              style={overlayStyle}
-              variants={{
-                rest: { opacity: 0.55 },
-                hover: {
-                  opacity: 0,
-                  transition: { duration: 0.45, ease: "easeOut" },
-                },
-              }}
-            />
-          </motion.div>
+              <motion.div
+                style={overlayStyle}
+                variants={{
+                  rest: { opacity: 0.55 },
+                  hover: {
+                    opacity: 0,
+                    transition: { duration: 0.45, ease: "easeOut" },
+                  },
+                }}
+              />
+            </motion.div>
+          )}
 
           <div style={metaWrapperStyle}>
             <div style={labelStyle}>{project.type}</div>
@@ -429,17 +756,36 @@ const Works = () => {
             <p style={techListStyle}>{project.technologies.join("  •  ")}</p>
 
             <div style={buttonRowStyle}>
-              <motion.a
-                href={project.manualUrl}
-                target="_blank"
-                rel="noreferrer"
-                whileHover={secondaryButtonHover}
-                whileTap={{ scale: 0.97 }}
-              >
-                <button type="button" style={secondaryButtonStyle}>
+              {project.manualImages && onOpenManual ? (
+                <motion.button
+                  type="button"
+                  style={secondaryButtonStyle}
+                  onClick={() =>
+                    onOpenManual({
+                      title: `${project.title} — System Manual`,
+                      helperText: project.manualHelperText,
+                      images: project.manualImages,
+                      projectId: `featured-project-${index}`,
+                    })
+                  }
+                  whileHover={secondaryButtonHover}
+                  whileTap={{ scale: 0.97 }}
+                >
                   View System Manual
-                </button>
-              </motion.a>
+                </motion.button>
+              ) : (
+                <motion.a
+                  href={project.manualUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  whileHover={secondaryButtonHover}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <button type="button" style={secondaryButtonStyle}>
+                    View System Manual
+                  </button>
+                </motion.a>
+              )}
 
               <motion.a
                 href={project.demoUrl}
@@ -514,9 +860,19 @@ const Works = () => {
               const projectId = `other-${index}`;
               const isVisible = visibleProjects[projectId] ?? false;
               
+              // Check if this is one of the 3 projects that need different button text
+              const isSpecialProject = 
+                project.title === "C&S Cakes and Bakery Products Brand Landing Page" ||
+                project.title === "Barangay Lumbia SK Official Website" ||
+                project.title === "Ysl Ron Hepos – Personal Portfolio Website";
+              
+              const manualButtonText = isSpecialProject ? "View Github Repo" : "View System Manual";
+              const demoButtonText = isSpecialProject ? "View Live Website" : "View System Demo";
+              
               return (
                 <motion.li
                   key={index}
+                  id={`other-project-${index}`}
                   ref={(el) => {
                     if (el) {
                       el.dataset.projectId = projectId;
@@ -629,18 +985,37 @@ const Works = () => {
                         marginTop: "auto",
                       }}
                     >
-                      <motion.a
-                        href={project.manualUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        whileHover={secondaryButtonHover}
-                        whileTap={{ scale: 0.97 }}
-                        style={{ flex: "1 1 auto", minWidth: "0" }}
-                      >
-                        <button type="button" style={{ ...secondaryButtonStyle, width: "100%", whiteSpace: "nowrap" }}>
-                          View System Manual
-                        </button>
-                      </motion.a>
+                      {project.manualImages && onOpenManual ? (
+                        <motion.button
+                          type="button"
+                          style={{ ...secondaryButtonStyle, width: "100%", whiteSpace: "nowrap", flex: "1 1 auto", minWidth: "0" }}
+                          onClick={() =>
+                            onOpenManual({
+                              title: `${project.title} — System Manual`,
+                              helperText: project.manualHelperText,
+                              images: project.manualImages,
+                              projectId: `other-project-${index}`,
+                            })
+                          }
+                          whileHover={secondaryButtonHover}
+                          whileTap={{ scale: 0.97 }}
+                        >
+                          {manualButtonText}
+                        </motion.button>
+                      ) : (
+                        <motion.a
+                          href={project.manualUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          whileHover={secondaryButtonHover}
+                          whileTap={{ scale: 0.97 }}
+                          style={{ flex: "1 1 auto", minWidth: "0" }}
+                        >
+                          <button type="button" style={{ ...secondaryButtonStyle, width: "100%", whiteSpace: "nowrap" }}>
+                            {manualButtonText}
+                          </button>
+                        </motion.a>
+                      )}
                       <motion.a
                         href={project.demoUrl}
                         target="_blank"
@@ -650,7 +1025,7 @@ const Works = () => {
                         style={{ flex: "1 1 auto", minWidth: "0" }}
                       >
                         <button type="button" style={{ ...secondaryButtonStyle, width: "100%", whiteSpace: "nowrap" }}>
-                          View System Demo
+                          {demoButtonText}
                         </button>
                       </motion.a>
                     </div>

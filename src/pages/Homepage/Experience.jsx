@@ -27,6 +27,7 @@ const Experience = () => {
     },
     {
       company: "CPC Marketing Consultancy & Services",
+      companyLink: "https://www.facebook.com/CPCMarketingOfficialPage",
       title: "Computer Graphics Artist",
       location: "Pagadian City, Philippines",
       period: "2024 - Present",
@@ -39,6 +40,7 @@ const Experience = () => {
     },
     {
       company: "Brown Butter Café",
+      companyLink: "https://www.facebook.com/profile.php?id=100083190829443",
       title: "Kitchen Staff",
       location: "Pagadian City, Philippines",
       period: "2023-2024",
@@ -273,9 +275,30 @@ const Experience = () => {
                 <span style={jobTitleStyle}>
                   {experiences[selectedIndex].title}
                 </span>{" "}
-                <span style={companyNameStyle}>
-                  @ {experiences[selectedIndex].company}
-                </span>
+                {experiences[selectedIndex].companyLink ? (
+                  <a
+                    href={experiences[selectedIndex].companyLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      ...companyNameStyle,
+                      textDecoration: "none",
+                      transition: "color 0.2s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "#22c55e";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "#04D27B";
+                    }}
+                  >
+                    @ {experiences[selectedIndex].company}
+                  </a>
+                ) : (
+                  <span style={companyNameStyle}>
+                    @ {experiences[selectedIndex].company}
+                  </span>
+                )}
               </h3>
               <p className="experience-location" style={locationStyle}>
                 {experiences[selectedIndex].location} |{" "}
