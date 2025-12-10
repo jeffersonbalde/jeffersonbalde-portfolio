@@ -440,6 +440,7 @@ const Works = ({ onOpenManual }) => {
       manualHelperText:
         "UI walkthrough covering BRIMS features for municipality admins and barangay personnel, including reporting, validation, assistance management, and analytics.",
       demoUrl: "https://brimsclient-ihpwt.ondigitalocean.app/",
+      demoButtonUrl: "https://youtu.be/-tScqcKdlLM?si=Ivho6Nkq6lK1EjjB",
       image: projectImage,
     },
     {
@@ -788,7 +789,7 @@ const Works = ({ onOpenManual }) => {
               )}
 
               <motion.a
-                href={project.demoUrl}
+                href={project.demoButtonUrl || project.demoUrl}
                 target="_blank"
                 rel="noreferrer"
                 whileHover={secondaryButtonHover}
